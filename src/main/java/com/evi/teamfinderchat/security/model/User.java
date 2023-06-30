@@ -1,6 +1,5 @@
 package com.evi.teamfinderchat.security.model;
 
-import com.evi.teamfinderchat.domain.GroupRoom;
 import lombok.*;
 import org.hibernate.annotations.Where;
 import org.springframework.security.core.CredentialsContainer;
@@ -33,20 +32,9 @@ public class User implements UserDetails, CredentialsContainer {
     @NotBlank
     private String password;
 
-
-    @ManyToMany
-    @JoinTable(
-            name = "users_groups",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "group_id"))
-    private List<GroupRoom> groupRooms = new ArrayList<>();
-
     @ManyToOne(cascade=CascadeType.MERGE)
     @JoinColumn(name="role_id")
     private Role role;
-
-
-
 
     public String roleToString(){
         return this.role.getName();

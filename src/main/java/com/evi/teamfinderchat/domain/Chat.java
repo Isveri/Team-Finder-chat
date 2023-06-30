@@ -16,12 +16,13 @@ public class Chat {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(cascade=CascadeType.REMOVE)
-    private GroupRoom groupRoom;
+    private Long groupId;
 
     @OneToMany(mappedBy = "chat",cascade = CascadeType.MERGE)
     private List<Message> messages;
 
+    @OneToMany(mappedBy ="chatId",cascade = CascadeType.MERGE)
+    private List<Friend> users;
 
     @Builder.Default
     private boolean notPrivate = true;
