@@ -1,5 +1,6 @@
 package com.evi.teamfinderchat.messaging.converter;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jms.support.converter.MessageConverter;
 
 import com.evi.teamfinderchat.messaging.model.Notification;
@@ -16,6 +17,7 @@ import javax.jms.TextMessage;
 
 
 @Component
+@ConditionalOnProperty(prefix = "notification", name = "service",havingValue = "activemq")
 public class NotificationMessageConverter implements MessageConverter {
 
     private static final Logger LOGGER =
