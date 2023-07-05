@@ -83,9 +83,7 @@ public class ChatServiceImpl implements ChatService {
             msg.setStatuses(List.of(msgStatus));
             chat.getMessages().add(msg);
             chatRepository.save(chat);
-          //TODO NOTYFIKACJE
-         //  sseService.sendSseFriendEvent(CustomNotificationDTO.builder().msg("New message").type(CustomNotification.NotifType.PRIVATE_MESSAGE).build(), friend.getUser().getId());
-            notificationMessagingService.sendNotification(Notification.builder().msg("New message").notificationType(Notification.NotificationType.PRIVATE_MESSAGE).userId(friend.getId()).build());
+            notificationMessagingService.sendNotification(Notification.builder().msg("New message").notificationType(Notification.NotificationType.PRIVATE_MESSAGE).userId(friend.getUser().getId()).build());
             return messageMapper.mapMessageToMessageDTO(msg);
         }
         throw new EmptyMessageException("Cannot send empty message");
@@ -99,9 +97,7 @@ public class ChatServiceImpl implements ChatService {
         messageList.forEach((message -> {
             messageRepository.save(setStatus(user, message));
         }));
-        //TODO NOTYFIKACJE
-        //sseService.sendSseFriendEvent(CustomNotificationDTO.builder().msg("New message").type(CustomNotification.NotifType.PRIVATE_MESSAGE).build(), user.getId());
-        notificationMessagingService.sendNotification(Notification.builder().msg("New message").notificationType(Notification.NotificationType.PRIVATE_MESSAGE).userId(user.getId()).build());
+        notificationMessagingService.sendNotification(Notification.builder().msg("").notificationType(Notification.NotificationType.PRIVATE_MESSAGE).userId(user.getId()).build());
 
         return null;
     }
@@ -154,8 +150,8 @@ public class ChatServiceImpl implements ChatService {
     public List<UnreadMessageCountDTO> countUnreadMessages() {
         List<UnreadMessageCountDTO> unreadMessages = new ArrayList<>();
         User user = userRepository.findById(getCurrentUser().getId()).orElseThrow(() -> new UserNotFoundException("User not found"));
-        List<Friend> friends = friendRepository.findAllByUser(user).orElseThrow(() -> new UserNotFoundException("User not found"));
-        friends.forEach((friend -> {
+        //TODO opcjonalnie można spytac serwis core o liste znajomych na podstawie usera
+        user.getFriendList().forEach((friend -> {
             UnreadMessageCountDTO unreadMessageCountDTO = new UnreadMessageCountDTO();
             unreadMessageCountDTO.setUserId(friend.getUser().getId());
             unreadMessageCountDTO.setCount(messageRepository.countAllByStatusesUser(MessageStatus.Status.UNREAD, friend.getUser().getId(), friend.getChatId()));

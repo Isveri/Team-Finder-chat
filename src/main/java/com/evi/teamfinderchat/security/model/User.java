@@ -1,5 +1,6 @@
 package com.evi.teamfinderchat.security.model;
 
+import com.evi.teamfinderchat.domain.Friend;
 import lombok.*;
 import org.hibernate.annotations.Where;
 import org.springframework.security.core.CredentialsContainer;
@@ -20,6 +21,7 @@ import java.util.List;
 @Entity
 @Builder
 @Table(name="users")
+@EqualsAndHashCode(of = {"id","username"})
 @Where(clause = "deleted=false")
 public class User implements UserDetails, CredentialsContainer {
     @Id
@@ -35,6 +37,15 @@ public class User implements UserDetails, CredentialsContainer {
     @ManyToOne(cascade=CascadeType.MERGE)
     @JoinColumn(name="role_id")
     private Role role;
+
+    @ManyToMany
+    @JoinTable(
+            name="users_friends",
+            joinColumns = @JoinColumn(name="user_id"),
+            inverseJoinColumns = @JoinColumn(name="friend_id")
+    )
+    private List<Friend> friendList;
+
 
     public String roleToString(){
         return this.role.getName();
