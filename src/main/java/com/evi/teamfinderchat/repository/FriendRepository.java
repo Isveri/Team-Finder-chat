@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface FriendRepository extends JpaRepository<Friend,Long> {
+public interface FriendRepository extends JpaRepository<Friend, Long> {
 
     Optional<List<Friend>> findAllByUser(User user);
 

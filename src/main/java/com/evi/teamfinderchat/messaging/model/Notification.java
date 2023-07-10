@@ -9,7 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 public class Notification {
 
-    public enum NotificationType{
+    public enum NotificationType {
         REMOVED,
         INFO,
         WARNING,

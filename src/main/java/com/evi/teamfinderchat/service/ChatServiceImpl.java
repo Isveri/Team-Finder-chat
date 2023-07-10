@@ -35,7 +35,6 @@ public class ChatServiceImpl implements ChatService {
     private final UserRepository userRepository;
     private final MessageRepository messageRepository;
     private final MessageStatusRepository messageStatusRepository;
-    private final FriendRepository friendRepository;
     private final NotificationMessagingService notificationMessagingService;
 
 
@@ -137,7 +136,7 @@ public class ChatServiceImpl implements ChatService {
         User admin = getCurrentUser();
 
         if (admin.getRole().getName().equals("ROLE_ADMIN")) {
-            return messageRepository.findAllByUserIdAndChat_notPrivate(userId,true)
+            return messageRepository.findAllByUserIdAndChat_notPrivate(userId, true)
                     .stream()
                     .map(messageMapper::mapMessageToMessageLogsDTO)
                     .collect(Collectors.toList());
@@ -164,7 +163,7 @@ public class ChatServiceImpl implements ChatService {
     public List<MessageDTO> getDeletedGroupChatLogs(Long groupId) {
         User user = getCurrentUser();
         if (user.getRole().getName().equals("ROLE_ADMIN")) {
-            Chat chat = chatRepository.findChatByGroupId(groupId).orElseThrow(()-> new ChatNotFoundException("Chat for group with id: "+groupId+" not found"));
+            Chat chat = chatRepository.findChatByGroupId(groupId).orElseThrow(() -> new ChatNotFoundException("Chat for group with id: " + groupId + " not found"));
             return chat.getMessages()
                     .stream()
                     .map(messageMapper::mapMessageToMessageDTO)
@@ -184,7 +183,7 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public Long createPrivateChat() {
-        Chat chat  = Chat.builder().build();
+        Chat chat = Chat.builder().build();
 
         return chatRepository.save(chat).getId();
     }

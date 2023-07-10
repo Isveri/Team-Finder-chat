@@ -10,13 +10,14 @@ import javax.jms.Queue;
 
 @Service
 @RequiredArgsConstructor
-@ConditionalOnProperty(prefix = "notification", name = "service",havingValue = "activemq")
+@ConditionalOnProperty(prefix = "notification", name = "service", havingValue = "activemq")
 public class JmsMessagingService implements NotificationMessagingService {
 
     private final JmsTemplate jmsTemplate;
     private final Queue queue;
+
     @Override
     public void sendNotification(Notification notification) {
-        jmsTemplate.convertAndSend(queue,notification);
+        jmsTemplate.convertAndSend(queue, notification);
     }
 }

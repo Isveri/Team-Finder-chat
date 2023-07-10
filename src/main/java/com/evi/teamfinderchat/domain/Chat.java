@@ -18,10 +18,10 @@ public class Chat {
 
     private Long groupId;
 
-    @OneToMany(mappedBy = "chat",cascade = CascadeType.MERGE)
+    @OneToMany(mappedBy = "chat", cascade = CascadeType.MERGE)
     private List<Message> messages;
 
-    @OneToMany(mappedBy ="chatId",cascade = CascadeType.MERGE)
+    @OneToMany(mappedBy = "chatId", cascade = CascadeType.MERGE)
     private List<Friend> users;
 
     @Builder.Default

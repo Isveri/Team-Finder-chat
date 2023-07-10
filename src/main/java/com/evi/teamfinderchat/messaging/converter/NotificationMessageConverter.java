@@ -17,16 +17,18 @@ import javax.jms.TextMessage;
 
 
 @Component
-@ConditionalOnProperty(prefix = "notification", name = "service",havingValue = "activemq")
+@ConditionalOnProperty(prefix = "notification", name = "service", havingValue = "activemq")
 public class NotificationMessageConverter implements MessageConverter {
 
     private static final Logger LOGGER =
             LoggerFactory.getLogger(NotificationMessageConverter.class);
 
     ObjectMapper mapper;
+
     public NotificationMessageConverter() {
         mapper = new ObjectMapper();
     }
+
     @Override
     public Message toMessage(Object object, Session session)
             throws JMSException {

@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-@ConditionalOnProperty(prefix = "notification", name = "service",havingValue = "kafka")
+@ConditionalOnProperty(prefix = "notification", name = "service", havingValue = "kafka")
 public class KafkaProducerConfig {
 
     @Value("${spring.kafka.producer.bootstrap-servers}")
@@ -41,7 +41,6 @@ public class KafkaProducerConfig {
     public KafkaTemplate<String, Notification> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
-
 
 
 }

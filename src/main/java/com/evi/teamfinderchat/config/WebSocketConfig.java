@@ -76,8 +76,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                         String groupIdString = groupIdList.get(0).substring(0);
                         groupId = Long.valueOf(groupIdString);
                         isPrivateChat = false;
-                    }
-                    else if(chatIdList != null){
+                    } else if (chatIdList != null) {
                         String chatIdString = chatIdList.get(0).substring(0);
                         chatId = Long.valueOf(chatIdString);
                     }
@@ -96,14 +95,14 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
                         SecurityContextHolder.getContext().setAuthentication(authentication);
                         User usr = getCurrentUser();
-                        if(!isPrivateChat) {
+                        if (!isPrivateChat) {
                             List<Long> groupUsersIds = userRepository.findUsersIds(groupId).orElseThrow(() -> new GroupNotFoundException("Group not found"));
                             if (groupUsersIds.contains(usr.getId()) || usr.getRole().getName().equals("ROLE_ADMIN")) {
                                 accessor.setUser(authentication);
                             }
-                        }else{
-                            Chat chat = chatRepository.findByIdFetch(chatId).orElseThrow(()-> new ChatNotFoundException("Chat doesnt exist"));
-                            if(chat.getUsers().stream().filter((friend -> friend.getUser().equals(usr))).findFirst().orElseThrow(null)!=null){
+                        } else {
+                            Chat chat = chatRepository.findByIdFetch(chatId).orElseThrow(() -> new ChatNotFoundException("Chat doesnt exist"));
+                            if (chat.getUsers().stream().filter((friend -> friend.getUser().equals(usr))).findFirst().orElseThrow(null) != null) {
                                 accessor.setUser(authentication);
                             }
                         }

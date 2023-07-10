@@ -13,7 +13,7 @@ import javax.persistence.*;
 @Entity
 public class MessageStatus {
 
-    public enum Status{
+    public enum Status {
         READ,
         UNREAD
     }
@@ -25,11 +25,11 @@ public class MessageStatus {
     @Builder.Default
     private Status status = Status.UNREAD;
 
-    @ManyToOne(cascade=CascadeType.MERGE)
-    @JoinColumn(name="user_id")
+    @ManyToOne(cascade = CascadeType.MERGE)
+    @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(cascade=CascadeType.MERGE)
-    @JoinColumn(name="message_id")
+    @ManyToOne(cascade = CascadeType.MERGE)
+    @JoinColumn(name = "message_id")
     private Message message;
 }

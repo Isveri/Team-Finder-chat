@@ -19,7 +19,7 @@ public class MessageLogsDTO {
     private String text;
     private UserMsgDTO user;
     @JsonSerialize(as = LocalDateTime.class)
-    @JsonFormat(shape= JsonFormat.Shape.STRING,pattern="yyyy-MM-dd HH:mm")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime date;
     private String groupName;
 }

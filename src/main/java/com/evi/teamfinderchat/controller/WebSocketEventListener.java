@@ -19,8 +19,8 @@ import java.util.*;
 public class WebSocketEventListener {
     private final SimpMessagingTemplate messagingTemplate;
 
-    private Map<String,String> destination = new HashMap<>();
-    private Map<String,Map<String,Long>> connectedUsers = new HashMap<>();
+    private Map<String, String> destination = new HashMap<>();
+    private Map<String, Map<String, Long>> connectedUsers = new HashMap<>();
 
 
     @EventListener
@@ -31,19 +31,20 @@ public class WebSocketEventListener {
 
         String id = getGroupIdFromHeader(headers);
 
-        Principal principal =  headers.getUser();
+        Principal principal = headers.getUser();
         User user = (User) (principal != null ? ((UsernamePasswordAuthenticationToken) principal).getPrincipal() : null);
 
-        Map<String,Long> users = getMapById(id) ;
+        Map<String, Long> users = getMapById(id);
 
-        if(!users.containsKey(headers.getSessionId())) {
+        if (!users.containsKey(headers.getSessionId())) {
             users.put(headers.getSessionId(), user.getId());
         }
-        connectedUsers.put(id,users);
+        connectedUsers.put(id, users);
         Set<Long> usersIdToSend = getIds(id);
 
-        createMessage(usersIdToSend, username, "joined",id);
+        createMessage(usersIdToSend, username, "joined", id);
     }
+
     @EventListener
     public void handleSessionDisconnect(SessionDisconnectEvent event) {
 
@@ -56,19 +57,19 @@ public class WebSocketEventListener {
 
         Set<Long> usersIdToSend = getIds(id);
 
-        createMessage(usersIdToSend, username, "left",id);
+        createMessage(usersIdToSend, username, "left", id);
 
     }
 
     private Set<Long> getIds(String id) {
         Set<Long> usersIdToSend = new HashSet<>();
-        for(Map.Entry<String,Long> entry: connectedUsers.get(id).entrySet()){
+        for (Map.Entry<String, Long> entry : connectedUsers.get(id).entrySet()) {
             usersIdToSend.add(entry.getValue());
         }
         return usersIdToSend;
     }
 
-    private String getGroupIdFromHeader(SimpMessageHeaderAccessor headers){
+    private String getGroupIdFromHeader(SimpMessageHeaderAccessor headers) {
         List<String> idList = headers.getNativeHeader("destination");
         String[] splited = idList.get(0).split("/");
         String id = splited[splited.length - 1];
@@ -76,15 +77,15 @@ public class WebSocketEventListener {
         return id;
     }
 
-    private Map<String,Long> getMapById(String id){
-        if(connectedUsers.get(id)==null){
-             return new HashMap<>();
+    private Map<String, Long> getMapById(String id) {
+        if (connectedUsers.get(id) == null) {
+            return new HashMap<>();
         }
         return connectedUsers.get(id);
     }
 
-    private void createMessage(Set<Long> usersIdToSend,String username, String value, String id){
-        MessageDTO messageDTO = MessageDTO.builder().text(username +" "+value+" chat").connectedUsers(new ArrayList<>(usersIdToSend)).build();
-        messagingTemplate.convertAndSend("/topic/messages/"+id,messageDTO);
+    private void createMessage(Set<Long> usersIdToSend, String username, String value, String id) {
+        MessageDTO messageDTO = MessageDTO.builder().text(username + " " + value + " chat").connectedUsers(new ArrayList<>(usersIdToSend)).build();
+        messagingTemplate.convertAndSend("/topic/messages/" + id, messageDTO);
     }
 }

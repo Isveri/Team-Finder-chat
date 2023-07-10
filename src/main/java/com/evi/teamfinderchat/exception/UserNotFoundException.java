@@ -3,7 +3,7 @@ package com.evi.teamfinderchat.exception;
 import lombok.Getter;
 
 @Getter
-public class UserNotFoundException extends RuntimeException{
+public class UserNotFoundException extends RuntimeException {
 
     private final String code = "1";
 

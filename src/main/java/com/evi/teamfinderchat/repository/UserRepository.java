@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends JpaRepository<User,Long> {
+public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByUsername(String username);
 
-    @Query(value = "SELECT user_id from users_groups g where g.group_id = :groupId " ,nativeQuery = true)
+    @Query(value = "SELECT user_id from users_groups g where g.group_id = :groupId ", nativeQuery = true)
     Optional<List<Long>> findUsersIds(Long groupId);
 
 }
