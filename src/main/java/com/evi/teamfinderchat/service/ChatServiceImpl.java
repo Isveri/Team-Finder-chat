@@ -15,8 +15,8 @@ import com.evi.teamfinderchat.repository.*;
 import com.evi.teamfinderchat.security.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
