@@ -2,6 +2,7 @@ package com.evi.teamfinderchat.domain;
 
 import com.evi.teamfinderchat.security.model.User;
 import lombok.*;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 
@@ -12,7 +13,9 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-public class Friend {
+@Where(clause = "deleted=false")
+public class UserFriend {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,8 +23,11 @@ public class Friend {
     @ManyToOne
     private User user;
 
-    @Builder.Default
-    private boolean online = false;
+    @ManyToOne
+    private User friend;
 
     private Long chatId;
+
+    @Builder.Default
+    private boolean deleted = false;
 }

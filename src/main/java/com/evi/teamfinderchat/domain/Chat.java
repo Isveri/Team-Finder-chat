@@ -22,7 +22,7 @@ public class Chat {
     private List<Message> messages;
 
     @OneToMany(mappedBy = "chatId", cascade = CascadeType.MERGE)
-    private List<Friend> users;
+    private List<UserFriend> users;
 
     @Builder.Default
     private boolean notPrivate = true;

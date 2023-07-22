@@ -49,7 +49,7 @@ public class WebSocketEventListener {
     public void handleSessionDisconnect(SessionDisconnectEvent event) {
 
         SimpMessageHeaderAccessor headers = SimpMessageHeaderAccessor.wrap(event.getMessage());
-        String username = headers.getUser().getName();
+        String username = Objects.requireNonNull(headers.getUser()).getName();
 
         String id = destination.get(event.getSessionId());
 

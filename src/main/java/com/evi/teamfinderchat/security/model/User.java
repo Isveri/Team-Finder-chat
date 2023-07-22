@@ -1,6 +1,6 @@
 package com.evi.teamfinderchat.security.model;
 
-import com.evi.teamfinderchat.domain.Friend;
+import com.evi.teamfinderchat.domain.UserFriend;
 import lombok.*;
 import org.hibernate.annotations.Where;
 import org.springframework.security.core.CredentialsContainer;
@@ -38,13 +38,8 @@ public class User implements UserDetails, CredentialsContainer {
     @JoinColumn(name="role_id")
     private Role role;
 
-    @ManyToMany
-    @JoinTable(
-            name="users_friends",
-            joinColumns = @JoinColumn(name="user_id"),
-            inverseJoinColumns = @JoinColumn(name="friend_id")
-    )
-    private List<Friend> friendList;
+    @OneToMany(mappedBy = "friend",fetch = FetchType.EAGER)
+    private List<UserFriend> userFriendList;
 
 
     public String roleToString(){

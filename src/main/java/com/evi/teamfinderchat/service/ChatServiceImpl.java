@@ -1,7 +1,7 @@
 package com.evi.teamfinderchat.service;
 
 import com.evi.teamfinderchat.domain.Chat;
-import com.evi.teamfinderchat.domain.Friend;
+import com.evi.teamfinderchat.domain.UserFriend;
 import com.evi.teamfinderchat.domain.Message;
 import com.evi.teamfinderchat.domain.MessageStatus;
 import com.evi.teamfinderchat.exception.*;
@@ -75,14 +75,14 @@ public class ChatServiceImpl implements ChatService {
         if (messageDTO.getText() != null) {
             Chat chat = chatRepository.findById(chatId).orElseThrow();
             Message msg = getMessage(messageDTO, chat);
-            Friend friend = chat.getUsers().stream().filter((fr -> !getCurrentUser().equals(fr.getUser()))).findAny().orElseThrow(() -> new UserNotFoundException("User doesnt exist"));
-            MessageStatus msgStatus = MessageStatus.builder().user(friend.getUser()).build();
+            UserFriend userFriend = chat.getUsers().stream().filter((fr -> !getCurrentUser().equals(fr.getUser()))).findAny().orElseThrow(() -> new UserNotFoundException("User doesnt exist"));
+            MessageStatus msgStatus = MessageStatus.builder().user(userFriend.getUser()).build();
             msgStatus.setMessage(msg);
             messageStatusRepository.save(msgStatus);
             msg.setStatuses(List.of(msgStatus));
             chat.getMessages().add(msg);
             chatRepository.save(chat);
-            notificationMessagingService.sendNotification(Notification.builder().msg("New message").notificationType(Notification.NotificationType.PRIVATE_MESSAGE).userId(friend.getUser().getId()).build());
+            notificationMessagingService.sendNotification(Notification.builder().msg("New message").notificationType(Notification.NotificationType.PRIVATE_MESSAGE).userId(userFriend.getUser().getId()).build());
             return messageMapper.mapMessageToMessageDTO(msg);
         }
         throw new EmptyMessageException("Cannot send empty message");
@@ -150,10 +150,10 @@ public class ChatServiceImpl implements ChatService {
         List<UnreadMessageCountDTO> unreadMessages = new ArrayList<>();
         User user = userRepository.findById(getCurrentUser().getId()).orElseThrow(() -> new UserNotFoundException("User not found"));
         //TODO opcjonalnie można spytac serwis core o liste znajomych na podstawie usera
-        user.getFriendList().forEach((friend -> {
+        user.getUserFriendList().forEach((userFriend -> {
             UnreadMessageCountDTO unreadMessageCountDTO = new UnreadMessageCountDTO();
-            unreadMessageCountDTO.setUserId(friend.getUser().getId());
-            unreadMessageCountDTO.setCount(messageRepository.countAllByStatusesUser(MessageStatus.Status.UNREAD, friend.getUser().getId(), friend.getChatId()));
+            unreadMessageCountDTO.setUserId(userFriend.getUser().getId());
+            unreadMessageCountDTO.setCount(messageRepository.countAllByStatusesUser(MessageStatus.Status.UNREAD, userFriend.getUser().getId(), userFriend.getChatId()));
             unreadMessages.add(unreadMessageCountDTO);
         }));
         return unreadMessages;
