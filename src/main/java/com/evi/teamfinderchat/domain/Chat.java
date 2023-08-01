@@ -16,12 +16,13 @@ public class Chat {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "group_id")
     private Long groupId;
 
     @OneToMany(mappedBy = "chat", cascade = CascadeType.MERGE)
     private List<Message> messages;
 
-    @OneToMany(mappedBy = "chatId", cascade = CascadeType.MERGE)
+    @OneToMany(mappedBy = "chatId", cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     private List<UserFriend> users;
 
     @Builder.Default

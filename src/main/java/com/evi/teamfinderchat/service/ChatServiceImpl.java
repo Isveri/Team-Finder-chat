@@ -183,7 +183,7 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public Long createPrivateChat() {
-        Chat chat = Chat.builder().build();
+        Chat chat = Chat.builder().notPrivate(false).build();
 
         return chatRepository.save(chat).getId();
     }

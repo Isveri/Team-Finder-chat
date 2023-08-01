@@ -62,54 +62,53 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             public Message<?> preSend(Message<?> message, MessageChannel channel) {
 
                 StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
-                if (StompCommand.CONNECT.equals(accessor.getCommand())) {
+                if (accessor != null && StompCommand.CONNECT.equals(accessor.getCommand())) {
                     List<String> tokenList = accessor.getNativeHeader("Authorization");
                     String jwt;
-                    boolean isPrivateChat = true;
 
-                    List<String> groupIdList = accessor.getNativeHeader("groupId");
                     List<String> chatIdList = accessor.getNativeHeader("chatId");
-                    Long groupId = null;
-                    Long chatId = null;
+                    Long chatId = extractIdValue(chatIdList);
 
-                    if (groupIdList != null) {
-                        String groupIdString = groupIdList.get(0).substring(0);
-                        groupId = Long.valueOf(groupIdString);
-                        isPrivateChat = false;
-                    } else if (chatIdList != null) {
-                        String chatIdString = chatIdList.get(0).substring(0);
-                        chatId = Long.valueOf(chatIdString);
-                    }
                     if (tokenList == null || tokenList.size() < 1) {
                         return message;
                     } else {
                         jwt = tokenList.get(0).substring(7);
 
                     }
-                    String username = jwtTokenUtil.getUsername(jwt);
 
-                    User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-                    if (jwtTokenUtil.validate(jwt)) {
-                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                                user, null, user.getAuthorities());
-
-                        SecurityContextHolder.getContext().setAuthentication(authentication);
-                        User usr = getCurrentUser();
-                        if (!isPrivateChat) {
-                            List<Long> groupUsersIds = userRepository.findUsersIds(groupId).orElseThrow(() -> new GroupNotFoundException("Group not found"));
-                            if (groupUsersIds.contains(usr.getId()) || usr.getRole().getName().equals("ROLE_ADMIN")) {
-                                accessor.setUser(authentication);
-                            }
-                        } else {
-                            Chat chat = chatRepository.findByIdFetch(chatId).orElseThrow(() -> new ChatNotFoundException("Chat doesnt exist"));
-                            if (chat.getUsers().stream().filter((friend -> friend.getUser().equals(usr))).findFirst().orElseThrow(null) != null) {
-                                accessor.setUser(authentication);
-                            }
-                        }
-                    }
+                    verifyAccessor(accessor, jwt, chatId);
                 }
                 return message;
             }
         });
+    }
+
+    private void verifyAccessor(StompHeaderAccessor accessor, String jwt, Long chatId) {
+        String username = jwtTokenUtil.getUsername(jwt);
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        if (jwtTokenUtil.validate(jwt)) {
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                    user, null, user.getAuthorities());
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            User usr = getCurrentUser();
+            Chat chat = chatRepository.findById(chatId).orElseThrow(() -> new ChatNotFoundException("Chat doesnt exist"));
+            if (chat.isNotPrivate()) {
+                List<Long> groupUsersIds = userRepository.findUsersIds(chat.getGroupId()).orElseThrow(() -> new GroupNotFoundException("Group not found"));
+                if (groupUsersIds.contains(usr.getId()) || usr.getRole().getName().equals("ROLE_ADMIN")) {
+                    accessor.setUser(authentication);
+                }
+            } else if (chat.getUsers().stream().filter((friend -> friend.getUser().equals(usr))).findFirst().orElseThrow(null) != null) {
+                accessor.setUser(authentication);
+            }
+        }
+    }
+
+    private Long extractIdValue(List<String> chatIdList){
+        if (chatIdList != null) {
+            String chatIdString = chatIdList.get(0);
+            return Long.valueOf(chatIdString);
+        }
+        return null;
     }
 }
