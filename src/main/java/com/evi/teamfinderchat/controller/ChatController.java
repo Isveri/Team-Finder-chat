@@ -5,6 +5,7 @@ import com.evi.teamfinderchat.model.MessageLogsDTO;
 import com.evi.teamfinderchat.model.UnreadMessageCountDTO;
 import com.evi.teamfinderchat.service.ChatService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -60,5 +61,11 @@ public class ChatController {
     @PostMapping("/private")
     public ResponseEntity<Long> createPrivateChat() {
         return ResponseEntity.ok(chatService.createPrivateChat());
+    }
+
+    @DeleteMapping("/private/{chatId}")
+    public ResponseEntity<Void> deletePrivateChat(@PathVariable Long chatId){
+        chatService.deleteChatById(chatId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

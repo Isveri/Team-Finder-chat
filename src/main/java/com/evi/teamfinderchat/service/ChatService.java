@@ -28,4 +28,6 @@ public interface ChatService {
     Long createChat(Long groupId);
 
     Long createPrivateChat();
+
+    void deleteChatById(Long chatId);
 }

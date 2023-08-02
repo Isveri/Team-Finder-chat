@@ -95,7 +95,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             Chat chat = chatRepository.findById(chatId).orElseThrow(() -> new ChatNotFoundException("Chat doesnt exist"));
             if (chat.isNotPrivate()) {
                 List<Long> groupUsersIds = userRepository.findUsersIds(chat.getGroupId()).orElseThrow(() -> new GroupNotFoundException("Group not found"));
-                if (groupUsersIds.contains(usr.getId()) || usr.getRole().getName().equals("ROLE_ADMIN")) {
+                if (groupUsersIds.contains(usr.getId()) || "ROLE_ADMIN".equals(usr.getRole().getName())) {
                     accessor.setUser(authentication);
                 }
             } else if (chat.getUsers().stream().filter((friend -> friend.getUser().equals(usr))).findFirst().orElseThrow(null) != null) {

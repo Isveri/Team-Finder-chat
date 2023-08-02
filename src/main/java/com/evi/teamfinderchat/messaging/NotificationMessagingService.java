@@ -4,5 +4,5 @@ import com.evi.teamfinderchat.messaging.model.Notification;
 
 public interface NotificationMessagingService {
 
-    public void sendNotification(Notification notification);
+    void sendNotification(Notification notification);
 }

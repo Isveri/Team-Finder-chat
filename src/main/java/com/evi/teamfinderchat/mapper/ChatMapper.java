@@ -9,5 +9,4 @@ import org.mapstruct.Mapper;
 @Mapper(builder = @Builder(disableBuilder = true),
         injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public abstract class ChatMapper {
-    public abstract ChatDTO mapChatToChatDTO(Chat chat);
 }

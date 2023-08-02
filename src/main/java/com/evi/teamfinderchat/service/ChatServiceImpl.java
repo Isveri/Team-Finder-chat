@@ -44,9 +44,9 @@ public class ChatServiceImpl implements ChatService {
 
         if (messageDTO.getText() != null) {
             User user = getCurrentUser();
-            List<Long> groupUsersIds = userRepository.findUsersIds(groupId).orElseThrow(() -> new GroupNotFoundException("Group not found"));
-            if (groupUsersIds.contains(user.getId()) || user.getRole().getName().equals("ROLE_ADMIN")) {
-                Chat chat = chatRepository.findChatByGroupId(groupId).orElseThrow(() -> new GroupNotFoundException("Chat not found"));
+            List<Long> groupUsersIds = userRepository.findUsersIds(groupId).orElseThrow(() -> new GroupNotFoundException("Users for group with id: %s not found ".formatted(groupId)));
+            if (groupUsersIds.contains(user.getId()) || checkIfAdmin(user)) {
+                Chat chat = findChatByGroupId(groupId);
                 Message msg = getMessage(messageDTO, chat);
                 chat.getMessages().add(msg);
                 chatRepository.save(chat);
@@ -121,8 +121,8 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public List<MessageDTO> getChatLogs(Long groupId) {
         User user = getCurrentUser();
-        if (user.getRole().getName().equals("ROLE_ADMIN")) {
-            return chatRepository.findChatByGroupId(groupId).orElseThrow(() -> new GroupNotFoundException("Chat not found"))
+        if (checkIfAdmin(user)) {
+            return findChatByGroupId(groupId)
                     .getMessages()
                     .stream()
                     .map(messageMapper::mapMessageToMessageDTO)
@@ -135,7 +135,7 @@ public class ChatServiceImpl implements ChatService {
     public List<MessageLogsDTO> getUserChatLogs(Long userId) {
         User admin = getCurrentUser();
 
-        if (admin.getRole().getName().equals("ROLE_ADMIN")) {
+        if (checkIfAdmin(admin)) {
             return messageRepository.findAllByUserIdAndChat_notPrivate(userId, true)
                     .stream()
                     .map(messageMapper::mapMessageToMessageLogsDTO)
@@ -148,8 +148,7 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public List<UnreadMessageCountDTO> countUnreadMessages() {
         List<UnreadMessageCountDTO> unreadMessages = new ArrayList<>();
-        User user = userRepository.findById(getCurrentUser().getId()).orElseThrow(() -> new UserNotFoundException("User not found"));
-        //TODO opcjonalnie można spytac serwis core o liste znajomych na podstawie usera
+        User user = userRepository.findById(getCurrentUser().getId()).orElseThrow(() -> new UserNotFoundException("User not found, id: %s ".formatted(getCurrentUser().getId())));
         user.getUserFriendList().forEach((userFriend -> {
             UnreadMessageCountDTO unreadMessageCountDTO = new UnreadMessageCountDTO();
             unreadMessageCountDTO.setUserId(userFriend.getUser().getId());
@@ -162,8 +161,8 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public List<MessageDTO> getDeletedGroupChatLogs(Long groupId) {
         User user = getCurrentUser();
-        if (user.getRole().getName().equals("ROLE_ADMIN")) {
-            Chat chat = chatRepository.findChatByGroupId(groupId).orElseThrow(() -> new ChatNotFoundException("Chat for group with id: " + groupId + " not found"));
+        if (checkIfAdmin(user)) {
+            Chat chat = findChatByGroupId(groupId);
             return chat.getMessages()
                     .stream()
                     .map(messageMapper::mapMessageToMessageDTO)
@@ -186,6 +185,19 @@ public class ChatServiceImpl implements ChatService {
         Chat chat = Chat.builder().notPrivate(false).build();
 
         return chatRepository.save(chat).getId();
+    }
+
+    @Override
+    public void deleteChatById(Long chatId) {
+        chatRepository.deleteById(chatId);
+    }
+
+    private boolean checkIfAdmin(User user){
+        return "ROLE_ADMIN".equals(user.getRole().getName());
+    }
+
+    private Chat findChatByGroupId(Long groupId){
+        return chatRepository.findChatByGroupId(groupId).orElseThrow(() -> new ChatNotFoundException("Chat for group with id: %s not found".formatted(groupId)));
     }
 }
 
